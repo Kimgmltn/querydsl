@@ -6,3 +6,6 @@ spring:
     url: jdbc:oracle:thin:@localhost:1521:xe
     username: big
     password: 1234
+  jpa:
+    hibernate:
+      ddl-auto: create

@@ -1,6 +1,9 @@
 plugins {
 	id 'org.springframework.boot' version '2.5.5'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	// querydsl 추가
+	id 'com.ewerk.gradle.plugins.querydsl' version '1.0.10'
+	// // querydsl 끝
 	id 'java'
 }
 
@@ -21,6 +24,9 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	// querydsl 라이브러리 추가
+	implementation 'com.querydsl:querydsl-jpa'
+	// // querydsl 라이브러리 끝
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.oracle.database.jdbc:ojdbc8'
 	annotationProcessor 'org.projectlombok:lombok'
@@ -30,3 +36,22 @@ dependencies {
 test {
 	useJUnitPlatform()
 }
+
+// querydsl 추가 시작. 빌드와 관련된 프로세스
+	// 빌드할때 만들어지는 Q클래스가 만들어지는 폴더
+def querydslDir = "$buildDir/generated/querydsl"
+
+querydsl {
+	jpa = true
+	querydslSourcesDir = querydslDir
+}
+sourceSets {
+	main.java.srcDir querydslDir
+}
+configurations {
+	querydsl.extendsFrom compileClasspath
+}
+compileQuerydsl {
+	options.annotationProcessorPath = configurations.querydsl
+}
+// // querydsl 추가 끝
