@@ -15,6 +15,7 @@ import javax.persistence.EntityManager;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
+import static study.querydsl.entity.QMember.*;
 
 @SpringBootTest
 @Transactional
@@ -22,6 +23,8 @@ public class QuerydslBasicTest {
 
     @Autowired
     EntityManager em;
+
+    JPAQueryFactory queryFactory = new JPAQueryFactory(em);
 
     @BeforeEach
     public void before(){
@@ -54,14 +57,15 @@ public class QuerydslBasicTest {
 
     @Test
     public void startQuerydsl(){
-        /* JPAQueryFactory를 만들때 EntityManager를 생성자에 넣어주어야함 */
-        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
-        QMember m = new QMember("m"); // 어떤 QMember인지 구분하기 위해 파라미터 추가
-
+        /*
+        * Q-type 클래스를 static import 하면 깔끔하게 코드를 쓸 수 있다.
+        * 같은 타입의 테이블을 join할때 Q-type을 새로만들어서 별칭을 다르게 주어서
+        * 사용하면 된다.
+        * */
         Member findMember = queryFactory
-                .select(m)
-                .from(m)
-                .where(m.username.eq("member1")) // 파라미터 바인딩
+                .select(member)
+                .from(member)
+                .where(member.username.eq("member1")) // 파라미터 바인딩
                 .fetchOne();
 
         assertThat(findMember.getUsername()).isEqualTo("member1");
