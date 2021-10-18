@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 import study.querydsl.entity.Member;
 import study.querydsl.entity.QMember;
@@ -24,7 +25,7 @@ public class QuerydslBasicTest {
     @Autowired
     EntityManager em;
 
-    JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+    JPAQueryFactory queryFactory;
 
     @BeforeEach
     public void before(){
@@ -42,6 +43,8 @@ public class QuerydslBasicTest {
         em.persist(member2);
         em.persist(member3);
         em.persist(member4);
+
+        queryFactory = new JPAQueryFactory(em);
     }
 
     @Test
@@ -62,6 +65,7 @@ public class QuerydslBasicTest {
         * 같은 타입의 테이블을 join할때 Q-type을 새로만들어서 별칭을 다르게 주어서
         * 사용하면 된다.
         * */
+        System.out.println("member = " + member);
         Member findMember = queryFactory
                 .select(member)
                 .from(member)
@@ -69,7 +73,27 @@ public class QuerydslBasicTest {
                 .fetchOne();
 
         assertThat(findMember.getUsername()).isEqualTo("member1");
+    }
 
+    @Test
+    public void search(){
+        Member findMember = queryFactory
+                .selectFrom(member)
+                .where(member.username.eq("member1")
+                        .and(member.age.eq(10)))
+                .fetchOne();
 
+        assertThat(findMember.getUsername()).isEqualTo("member1");
+    }
+
+    @Test
+    public void searchAndParam(){
+        Member findMember = queryFactory
+                .selectFrom(member)
+                .where(member.username.eq("member1")
+                        ,member.age.eq(10)) // ,로 연결하면 and이다.
+                .fetchOne();
+
+        assertThat(findMember.getUsername()).isEqualTo("member1");
     }
 }
